@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AGR - Quel super-héros es-tu ?</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f2f2f2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.card {
+    background: white;
+    padding: 40px;
+    width: 500px;
+    max-width: 90%;
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+h1 {
+    color: #8B0000;
+    margin-bottom: 10px;
+}
+
+button {
+    background-color: #8B0000;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    margin-top: 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+.answer-btn {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 12px;
+    border-radius: 6px;
+    border: 2px solid #8B0000;
+    background: white;
+    cursor: pointer;
+    transition: 0.2s;
+    color:black;
+}
+
+.answer-btn:hover {
+    background: #8B0000;
+    color: white;
+}
+
+.hidden {
+    display: none;
+}
+
+img {
+    max-width: 400px;
+    margin-top: 40px;
+}
+
+.logo {
+    display: block;
+    width: 100%;
+    max-width: 250px;
+    margin: 40px auto 20px auto;
+}
+
+#result-page {
+    text-align: center;
+}
+
+#result-image {
+    display: block;
+    max-width: 220px;
+    margin: 25px auto 20px auto;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <!-- PAGE ACCUEIL -->
+    <div id="start-page">
+        <img src="image/AGR-logo.png" alt="Logo Art'Vengers" class="logo">
+        <h1>AGR</h1>
+        <p>Quelle Pierre d'infinité es-tu ?</p>
+        <button onclick="startQuiz()">Art'vengers, rassemblement !</button>
+    </div>
+
+    <!-- QUIZ -->
+    <div id="quiz-page" class="hidden">
+        <p id="question-counter"></p>
+        <h2 id="question-text"></h2>
+        <div id="answers-container"></div>
+    </div>
+
+    <!-- RESULTATS -->
+    <div id="result-page" class="hidden">
+        <h1>Résultats</h1>
+        <div id="result-text"></div>
+        <img id="result-image" src="" alt="Pierre d'infinité">
+        <button onclick="restartQuiz()">Recommencer</button>
+    </div>
+
+</div>
+
+<script>
+
+const questions = [
+  {
+    question: "Ton plus grand atout, c’est :",
+    answers: [
+      { text: "Toujours savoir où aller et comment y arriver.", stone: "space" },
+      { text: "Comprendre plus vite que tout le monde.", stone: "mind" },
+      { text: "Ressentir profondément les gens et les choses.", stone: "soul" },
+      { text: "Réinventer le monde à ta manière.", stone: "reality" },
+      { text: "Prévoir les conséquences avant d’agir.", stone: "time" },
+      { text: "Frapper fort, mentalement ou physiquement.", stone: "power" }
+    ]
+  },
+  {
+    question: "Si tu pouvais avoir un pouvoir, tu choisirais :",
+    answers: [
+      { text: "Te téléporter instantanément où tu veux.", stone: "space" },
+      { text: "Lire dans les pensées ou booster ton intelligence.", stone: "mind" },
+      { text: "Comprendre l’âme et les émotions de chacun.", stone: "soul" },
+      { text: "Modifier ce qui t’entoure selon tes envies.", stone: "reality" },
+      { text: "Voir le futur ou revenir en arrière.", stone: "time" },
+      { text: "Déployer une puissance brute gigantesque.", stone: "power" }
+    ]
+  },
+  {
+    question: "Dans ton groupe d’amis, tu es plutôt :",
+    answers: [
+      { text: "Celui ou celle qui lance les plans et emmène tout le monde ailleurs.", stone: "space" },
+      { text: "Le cerveau du groupe, toujours une analyse d’avance.", stone: "mind" },
+      { text: "La personne à qui tout le monde se confie.", stone: "soul" },
+      { text: "L’original(e) qui change l’ambiance à lui/elle seul(e).", stone: "reality" },
+      { text: "Celui ou celle qui organise et anticipe tout.", stone: "time" },
+      { text: "La présence imposante qu’on remarque direct.", stone: "power" }
+    ]
+  },
+  {
+    question: "Ton environnement idéal, c’est :",
+    answers: [
+      { text: "Un vaisseau, une carte, et l’infini devant toi.", stone: "space" },
+      { text: "Une immense bibliothèque ou un labo futuriste.", stone: "mind" },
+      { text: "Un lieu calme, spirituel, presque sacré.", stone: "soul" },
+      { text: "Un monde étrange, magnifique, impossible à expliquer.", stone: "reality" },
+      { text: "Une salle remplie d’horloges, d’écrans et de trajectoires.", stone: "time" },
+      { text: "Une arène où tout se joue maintenant.", stone: "power" }
+    ]
+  },
+  {
+    question: "Face à un problème, ton premier réflexe est :",
+    answers: [
+      { text: "Chercher une autre voie ou contourner l’obstacle.", stone: "space" },
+      { text: "Analyser chaque détail avant de parler.", stone: "mind" },
+      { text: "Te demander ce que les autres ressentent dans la situation.", stone: "soul" },
+      { text: "Imaginer une solution complètement inattendue.", stone: "reality" },
+      { text: "Prendre ton temps pour voir loin.", stone: "time" },
+      { text: "Passer à l’action immédiatement.", stone: "power" }
+    ]
+  },
+  {
+    question: "Ce qui te fascine le plus, c’est :",
+    answers: [
+      { text: "L’univers, les galaxies, l’inconnu.", stone: "space" },
+      { text: "Le cerveau humain, les idées, la logique.", stone: "mind" },
+      { text: "Les émotions, les liens, ce qui est invisible mais réel.", stone: "soul" },
+      { text: "L’imaginaire, les illusions, les mondes alternatifs.", stone: "reality" },
+      { text: "Les paradoxes, l’histoire, ce qui aurait pu arriver.", stone: "time" },
+      { text: "L’énergie, la domination, la capacité à dépasser ses limites.", stone: "power" }
+    ]
+  },
+  {
+    question: "Ta plus grande peur, ce serait :",
+    answers: [
+      { text: "Être coincé(e), enfermé(e), sans horizon.", stone: "space" },
+      { text: "Perdre ta lucidité ou ne plus comprendre.", stone: "mind" },
+      { text: "Perdre quelqu’un ou te sentir vide intérieurement.", stone: "soul" },
+      { text: "Vivre dans quelque chose de fade et figé.", stone: "reality" },
+      { text: "Ne pas avoir assez de temps.", stone: "time" },
+      { text: "Être impuissant(e) quand ça compte vraiment.", stone: "power" }
+    ]
+  },
+  {
+    question: "Quel type de personnage te ressemble le plus ?",
+    answers: [
+      { text: "L’explorateur ou l’aventurier cosmique.", stone: "space" },
+      { text: "Le génie ou le stratège.", stone: "mind" },
+      { text: "Le sage ou le gardien des émotions.", stone: "soul" },
+      { text: "Le magicien ou l’illusionniste.", stone: "reality" },
+      { text: "Le gardien du temps ou l’architecte du futur.", stone: "time" },
+      { text: "Le guerrier ou le titan.", stone: "power" }
+    ]
+  },
+  {
+    question: "Ce que les gens disent souvent de toi :",
+    answers: [
+      { text: "Tu as besoin d’air, d’espace, de mouvement.", stone: "space" },
+      { text: "Tu réfléchis trop… mais souvent tu as raison.", stone: "mind" },
+      { text: "Tu comprends les autres sans qu’ils aient besoin de parler.", stone: "soul" },
+      { text: "Tu es imprévisible, dans le bon sens du terme.", stone: "reality" },
+      { text: "Tu sais toujours te projeter.", stone: "time" },
+      { text: "Tu dégages une vraie force.", stone: "power" }
+    ]
+  },
+  {
+    question: "Au fond, ce qui te motive le plus, c’est :",
+    answers: [
+      { text: "Découvrir ce qu’il y a au-delà.", stone: "space" },
+      { text: "Comprendre le monde et ses mécanismes.", stone: "mind" },
+      { text: "Créer des liens sincères et laisser une trace humaine.", stone: "soul" },
+      { text: "Transformer la réalité pour la rendre plus intense.", stone: "reality" },
+      { text: "Construire quelque chose qui dure dans le temps.", stone: "time" },
+      { text: "Te dépasser encore et encore.", stone: "power" }
+    ]
+  }
+];
+
+let currentQuestion = 0;
+let scores = {
+space: 0,
+mind: 0,
+soul: 0,
+reality: 0,
+time: 0,
+power: 0
+};
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function startQuiz() {
+document.getElementById("start-page").classList.add("hidden");
+document.getElementById("quiz-page").classList.remove("hidden");
+showQuestion();
+}
+
+function showQuestion() {
+let q = questions[currentQuestion];
+shuffleArray(q.answers);
+document.getElementById("question-counter").innerText = "Question " + (currentQuestion+1) + " / 10";
+document.getElementById("question-text").innerText = q.question;
+
+let container = document.getElementById("answers-container");
+container.innerHTML = "";
+
+q.answers.forEach(answer => {
+let btn = document.createElement("button");
+btn.innerText = answer.text;
+btn.classList.add("answer-btn");
+btn.onclick = () => selectAnswer(answer.stone);
+container.appendChild(btn);
+});
+}
+
+function selectAnswer(stone) {
+scores[stone]++;
+currentQuestion++;
+
+if (currentQuestion < questions.length) {
+showQuestion();
+} else {
+showResult();
+}
+}
+
+function showResult() {
+document.getElementById("quiz-page").classList.add("hidden");
+document.getElementById("result-page").classList.remove("hidden");
+
+let winner = Object.keys(scores).reduce((a,b) => scores[a] > scores[b] ? a : b);
+
+let resultText = "";
+let imageFile = "";
+
+if (winner === "space") {
+resultText = "Félicitations !! <br> <br> Tu es Pierre Rmj JhMac PierreDeL'Espace Mattioni ! <br> <br> Avec toi, c’est l’aventure assurée, tu as une soif de découverte et une capacité à t’adapter à tous les environnements, tu es un véritable Pierre de l’Espace ! <br> <br> ";
+imageFile = "image/RMJ.jpeg";
+}
+if (winner === "mind") {
+resultText = "Félicitations !! <br> <br> Tu es Pierre DrtKenny FxtEsay PierreDeL'Esprit Matheron-Malaty ! <br> <br> Au-delà d'avoir un nom tarpin long, tu as une intelligence et une capacité d'analyse digne d'un Kenny, surtout quand il s'agit d'un match de l'OM, tu es un véritable Pierre de l'Esprit ! <br> <br> ";
+imageFile = "image/DRT.jpeg";
+}
+if (winner === "soul") {
+resultText = "Félicitations !! <br> <br> Tu es Pierre Clic Jtb Clée ! <br> <br> Tu as une véritable âme d'entrepreneur, mais aussi et surtout une âme d'artiste, tu es un véritable Pierre de l'Âme ! <br> <br> ";
+imageFile = "image/Declic.jpeg";
+}
+if (winner === "reality") {
+resultText = "Félicitations !! <br> <br> Hasard de dingue ! <br> <br> Tu es Pierre FlmCristo PierreDeLaRéalité Niney ! <br> <br> Ton talent unique d'acteur polyvalent te permet de modeler la réalité à souhait et de faire rire tout le monde, tu es un véritable Pierre de la Réalité ! <br> <br> ";
+imageFile = "image/Niney.gif";
+}
+if (winner === "time") {
+resultText = "Félicitations !! <br> <br> Tu es Pierre AgrSifeur CanEye PierreDuTemps Pietropaoli ! <br> <br> Tu as des talents artistiques remarquables, tu es un véritable Pierre du Temps ! <br> <br> Il est grand temps que ton bureau soit élu, c'est pas les AGR qui le disent c'est l'algorithme... <br> <br> ";
+imageFile = "image/AGR.jpeg";
+}
+if (winner === "power") {
+resultText = "Félicitations !! <br> <br> Tu es Pierre PierreDeLaPuissance Minot ! <br> <br> Tu tapes comme un bourrin, mais toujours en rythme, un fanfaron né quoi. Tu es un véritable Pierre de la Puissance, ça rime avec roi de l'ambiance ! <br> <br> ";
+imageFile = "image/FMT.jpeg";
+}
+
+document.getElementById("result-text").innerHTML = resultText;
+document.getElementById("result-image").src = imageFile;
+}
+
+function restartQuiz() {
+currentQuestion = 0;
+scores = { space:0, mind:0, soul:0, reality:0, time:0, power:0 };
+
+document.getElementById("result-page").classList.add("hidden");
+document.getElementById("start-page").classList.remove("hidden");
+}
+
+</script>
+
+</body>
+</html>
